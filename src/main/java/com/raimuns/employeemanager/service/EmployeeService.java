@@ -1,5 +1,6 @@
 package com.raimuns.employeemanager.service;
 
+import com.raimuns.employeemanager.StringPatternValidator;
 import com.raimuns.employeemanager.domain.Employee;
 import com.raimuns.employeemanager.domain.EmployeeDto;
 import com.raimuns.employeemanager.exceptions.AppException;
@@ -21,6 +22,7 @@ import static com.raimuns.employeemanager.exceptions.ErrorMessage.*;
 @AllArgsConstructor
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
+    private final StringPatternValidator stringPatternValidator;
 
     public EmployeeDto addEmployee(EmployeeDto employeeDto) {
         employeeDto.setEmployeeCode(UUID.randomUUID().toString());
@@ -64,11 +66,25 @@ public class EmployeeService {
             throw new AppException(EMAIL_ALREADY_EXISTS, employeeDto.getEmail());
         }
 
+        if (stringPatternValidator.isEmailValid(employeeDto.getEmail())) {
+            if (!emailUpdate && employeeRepository.findByEmail(employeeDto.getEmail()).isPresent())
+                throw new AppException(EMAIL_ALREADY_EXISTS, employeeDto.getEmail());
+        } else {
+            throw new AppException(EMAIL_FORMAT_INVALID, employeeDto.getEmail());
+        }
+
+        if (stringPatternValidator.isDobValid(employeeDto.getDob())) {
+            if (Period.between(LocalDate.parse(employeeDto.getDob()), LocalDate.now()).getYears() < 18)
+                throw new AppException(EMPLOYEE_IS_NOT_ADULT);
+        } else {
+            throw new AppException(DOB_FORMAT_INVALID, employeeDto.getDob());
+        }
+
         if (Period.between(LocalDate.parse(employeeDto.getDob()), LocalDate.now()).getYears() < 18) {
             throw new AppException(EMPLOYEE_IS_NOT_ADULT);
         }
 
-        if (employeeDto.getPhone().length() != 9 && !employeeDto.getPhone().startsWith("+3519")) {
+        if (employeeDto.getPhone().length() != 13 || !employeeDto.getPhone().startsWith("+3519")) {
             throw new AppException(PHONE_NUMBER_INVALID, employeeDto.getPhone());
         }
     }

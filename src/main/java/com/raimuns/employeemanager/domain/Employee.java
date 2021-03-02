@@ -1,12 +1,15 @@
 package com.raimuns.employeemanager.domain;
 
 
+import com.raimuns.employeemanager.exceptions.AppException;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+
+import static com.raimuns.employeemanager.exceptions.ErrorMessage.JOB_TITLE_INVALID;
 
 @Data
 @Entity(name = "Employee")
@@ -39,7 +42,7 @@ public class Employee implements Serializable {
         setName(employeeDto.getName());
         setEmail(employeeDto.getEmail());
         setDob(LocalDate.parse(employeeDto.getDob()));
-        setJobTitle(JobTitle.valueOf(employeeDto.getJobTitle()));
+        matchJobTitle(employeeDto.getJobTitle());
         setPhone(employeeDto.getPhone());
         setImageUrl(employeeDto.getImageUrl());
         setEmployeeCode(employeeDto.getEmployeeCode());
@@ -49,8 +52,19 @@ public class Employee implements Serializable {
         setName(employeeDto.getName());
         setEmail(employeeDto.getEmail());
         setDob(LocalDate.parse(employeeDto.getDob()));
-        setJobTitle(JobTitle.valueOf(employeeDto.getJobTitle()));
+        matchJobTitle(employeeDto.getJobTitle());
         setPhone(employeeDto.getPhone());
         setImageUrl(employeeDto.getImageUrl());
+    }
+
+    private void matchJobTitle(String jobTitle) {
+
+        switch (jobTitle.toLowerCase()) {
+            case "ceo" -> setJobTitle(JobTitle.CEO);
+            case "designer" -> setJobTitle(JobTitle.DESIGNER);
+            case "developer" -> setJobTitle(JobTitle.DEVELOPER);
+            case "project manager" -> setJobTitle(JobTitle.PROJECT_MANAGER);
+            default -> throw new AppException(JOB_TITLE_INVALID, jobTitle);
+        }
     }
 }

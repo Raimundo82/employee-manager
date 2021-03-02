@@ -17,29 +17,28 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping(path = "/all")
-    public ResponseEntity<List<EmployeeDto>> getAllEmployee() {
-        return new ResponseEntity<>(employeeService.getAllEmployees(), HttpStatus.OK);
+    public List<EmployeeDto> getAllEmployee() {
+        return employeeService.getAllEmployees();
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<EmployeeDto> getEmployee(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(employeeService.getEmployeeById(id), HttpStatus.OK);
+    public EmployeeDto getEmployee(@PathVariable("id") Long id) {
+        return employeeService.getEmployeeById(id);
     }
 
     @PostMapping(path = "/add")
-    public ResponseEntity<EmployeeDto> addEmployee(@RequestBody EmployeeDto employeeDto) {
-        return new ResponseEntity<>(employeeService.addEmployee(employeeDto), HttpStatus.CREATED);
+    public EmployeeDto addEmployee(@RequestBody EmployeeDto employeeDto) {
+        return employeeService.addEmployee(employeeDto);
     }
 
     @PutMapping(path = "/update/{id}")
-    public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") Long id, @RequestBody EmployeeDto employeeDto) {
-        return new ResponseEntity<>(employeeService.updateEmployee(id, employeeDto), HttpStatus.OK);
+    public EmployeeDto updateEmployee(@PathVariable("id") Long id, @RequestBody EmployeeDto employeeDto) {
+        return employeeService.updateEmployee(id, employeeDto);
     }
 
     @DeleteMapping(path = "/delete/{id}")
-    public ResponseEntity<?> deleteEmployee(@PathVariable("id") Long id) {
+    public void deleteEmployee(@PathVariable("id") Long id) {
         employeeService.deleteEmployee(id);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
